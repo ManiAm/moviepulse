@@ -6,7 +6,7 @@ import json
 import logging
 import requests
 
-import models_sql
+#import models_sql
 import models_redis
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -242,30 +242,3 @@ class TMDB_REST_API_Client():
             return False, f'Error while decoding content: {E}'
 
         return True, data_dict
-
-
-if __name__ == "__main__":
-
-    # models_sql.init_db()
-
-    rest_obj = TMDB_REST_API_Client(host="api.themoviedb.org", api_ver="3")
-
-    status, output = rest_obj.discover_movies()
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = rest_obj.get_trending_movies()
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = rest_obj.get_movie_detail(movie_id=950387)
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = rest_obj.get_movie_credit(movie_id=950387)
-    if not status:
-        log.error(output)
-        sys.exit(2)

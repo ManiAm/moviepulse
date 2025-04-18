@@ -10,18 +10,18 @@ The backend is built using Python Flask, which serves a RESTful web service expo
 
 Since Flask’s built-in development server is not suitable for production use, I’ve deployed the backend using a Flask + Gunicorn + Nginx stack. This architecture ensures reliability, performance, and scalability for concurrent access.
 
-To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request. Redis is deployed in a Docker container to maintain state across reboots.
+All movie and TV data is fetched from The Movie Database (TMDb) - [API Reference](https://developer.themoviedb.org/reference/intro/getting-started). It provides a robust and well-documented REST API for accessing a wide range of metadata including trending content, credits, release information, etc.
 
-All movie and TV data is fetched from The Movie Database (TMDb) - [API Reference](https://developer.themoviedb.org/reference/intro/getting-started). It provides a robust and well-documented REST API for accessing a wide range of metadata, including trending content, credits, release information, and more.
+To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request. Redis is deployed in a Docker container to maintain state across reboots.
 
 The project structure looks like:
 
     /moviepulse/
     ├── backend/
     │   ├── app.py
+    │   ├── docker-compose.yml
     │   ├── models_redis.py
     │   ├── tmdb_client.py
-    │   ├── docker-compose.yml
     │   ├── requirements.txt
     │   └── .env  --> API token
     ├── frontend/
@@ -32,13 +32,9 @@ The project structure looks like:
 
 ------------------------------
 
-adding requirement file
-
 adding a gif from dani playing with cozila and navigating
 
 nginx config
-
-added license
 
 
 - **Frontend**: HTML + CSS + JavaScript (fetch API)
