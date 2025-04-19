@@ -5,6 +5,8 @@ import getpass
 import json
 import logging
 import requests
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 import models_redis
 
@@ -53,53 +55,6 @@ class TMDB_REST_API_Client():
 
 
     ########################
-    ####### Discover #######
-    ########################
-
-    def discover_movies(self,
-                        include_adult=False,
-                        include_video=False,
-                        language="en-US",
-                        sort_by="popularity.desc",
-                        release_date_gte=None,
-                        release_date_lte=None,
-                        with_release_type=None,
-                        max_pages=5):
-
-        url = f"{self.baseurl}/movie/popular"
-
-        page_num = 1
-        result_list = []
-
-        while True:
-
-            params = {
-                "page": page_num,
-                "include_adult": include_adult,
-                "include_video": include_video,
-                "language": language,
-                "sort_by": sort_by,
-                "release_date.gte": release_date_gte,
-                "release_date_lte": release_date_lte,
-                "with_release_type": with_release_type
-            }
-
-            status, output = self.__request("GET", url, params=params)
-            if not status:
-                return False, output
-
-            results = output.get("results", [])
-            result_list.extend(results)
-
-            total_pages = output.get("total_pages", 0)
-
-            if page_num >= min(max_pages, total_pages):
-                return True, result_list
-
-            page_num += 1
-
-
-    ########################
     ####### Trending #######
     ########################
 
@@ -135,11 +90,36 @@ class TMDB_REST_API_Client():
             page_num += 1
 
 
-    ######################
-    ####### Search #######
-    ######################
+    def get_trending_tvs(self, language="en-US", time_window="day", max_pages=5):
+        """
+            time_window = day or week
+        """
 
+        url = f"{self.baseurl}/trending/tv/{time_window}"
 
+        page_num = 1
+        result_list = []
+
+        while True:
+
+            params = {
+                "page": page_num,
+                "language": language
+            }
+
+            status, output = self.__request("GET", url, params=params)
+            if not status:
+                return False, output
+
+            results = output.get("results", [])
+            result_list.extend(results)
+
+            total_pages = output.get("total_pages", 0)
+
+            if page_num >= min(max_pages, total_pages):
+                return True, result_list
+
+            page_num += 1
 
 
     ############################
@@ -166,6 +146,10 @@ class TMDB_REST_API_Client():
 
     def get_movie_credit(self, movie_id, language="en-US"):
 
+        cached = models_redis.get_movie_credit_detail(movie_id)
+        if cached:
+            return True, cached
+
         url = f"{self.baseurl}/movie/{movie_id}/credits"
 
         params = {
@@ -176,7 +160,226 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
+        models_redis.save_movie_credit_detail(movie_id, output)
+
         return True, output
+
+
+    def get_movie_video(self, movie_id, language="en-US"):
+
+        url = f"{self.baseurl}/movie/{movie_id}/videos"
+
+        params = {
+            "language": language
+        }
+
+        status, output = self.__request("GET", url, params=params)
+        if not status:
+            return False, output
+
+        results = output.get("results", [])
+
+        return True, results
+
+
+    #########################
+    ####### TV Detail #######
+    #########################
+
+    def get_tv_detail(self, tv_id, language="en-US"):
+
+        cached = models_redis.get_tv_detail(tv_id)
+        if cached:
+            return True, cached
+
+        url = f"{self.baseurl}/tv/{tv_id}"
+        params = {"language": language}
+
+        status, output = self.__request("GET", url, params=params)
+        if not status:
+            return False, output
+
+        models_redis.save_tv_detail(tv_id, output)
+
+        return True, output
+ 
+
+    def get_tv_credit(self, tv_id, language="en-US"):
+
+        cached = models_redis.get_tv_credit_detail(tv_id)
+        if cached:
+            return True, cached
+
+        url = f"{self.baseurl}/tv/{tv_id}/credits"
+
+        params = {
+            "language": language
+        }
+
+        status, output = self.__request("GET", url, params=params)
+        if not status:
+            return False, output
+
+        models_redis.save_tv_credit_detail(tv_id, output)
+
+        return True, output
+
+
+    ###############################
+    ####### Discover Movies #######
+    ###############################
+
+    def discover_movies(self,
+                        include_adult=False,
+                        include_video=False,
+                        language="en-US",
+                        sort_by="popularity.desc",
+                        region=None,
+                        release_date_gte=None,
+                        release_date_lte=None,
+                        with_release_type=None,
+                        without_genres=None,
+                        vote_count_gte=None,
+                        vote_count_lte=None,
+                        max_pages=5):
+        """
+            Release	                Type
+            Premiere	            1
+            Theatrical (limited)	2
+            Theatrical	            3
+            Digital	                4
+            Physical	            5
+            TV	                    6
+        """
+
+        url = f"{self.baseurl}/discover/movie"
+
+        page_num = 1
+        result_list = []
+
+        while True:
+
+            params = {
+                "page": page_num,
+                "include_adult": include_adult,
+                "include_video": include_video,
+                "language": language,
+                "sort_by": sort_by,
+                "region": region,
+                "release_date.gte": release_date_gte,
+                "release_date.lte": release_date_lte,
+                "with_release_type": with_release_type,
+                "without_genres": without_genres,
+                "vote_count.gte": vote_count_gte,
+                "vote_count.lte": vote_count_lte
+            }
+
+            status, output = self.__request("GET", url, params=params)
+            if not status:
+                return False, output
+
+            results = output.get("results", [])
+            result_list.extend(results)
+
+            total_pages = output.get("total_pages", 0)
+
+            if page_num >= min(max_pages, total_pages):
+                return True, result_list
+
+            page_num += 1
+
+
+    def get_movies_popular(self):
+
+        return self.discover_movies(include_adult=False,
+                                    include_video=False,
+                                    language="en-US",
+                                    max_pages=5,
+                                    sort_by="popularity.desc")
+
+
+    def get_movies_now_playing(self):
+
+        return self.discover_movies(include_adult=False,
+                                    include_video=False,
+                                    language="en-US",
+                                    max_pages=5,
+                                    sort_by="popularity.desc",
+                                    with_release_type="2|3")
+
+
+    def get_movies_upcoming(self):
+
+        today = datetime.today()
+        today_str = today.strftime("%Y-%m-%d")
+
+        # Add 3 months
+        three_months_later = today + relativedelta(months=3)
+        three_months_str = three_months_later.strftime("%Y-%m-%d")
+
+        return self.discover_movies(include_adult=False,
+                                    include_video=False,
+                                    language="en-US",
+                                    max_pages=5,
+                                    sort_by="popularity.desc",
+                                    region="US",
+                                    with_release_type="2|3",
+                                    release_date_gte=today_str,
+                                    release_date_lte=three_months_str)
+
+
+    def get_movies_top_rated(self):
+
+        return self.discover_movies(include_adult=False,
+                                    include_video=False,
+                                    language="en-US",
+                                    max_pages=5,
+                                    sort_by="vote_average.desc",
+                                    without_genres="99,10755",
+                                    vote_count_gte=200)
+
+
+    def get_movies_adults(self):
+
+        return self.discover_movies(include_adult=True,
+                                    include_video=False,
+                                    language="en-US",
+                                    max_pages=5,
+                                    sort_by="popularity.desc")
+
+
+    ######################
+    ####### Search #######
+    ######################
+
+    def search(self, query, max_pages=5):
+
+        url = f"{self.baseurl}/search/multi"
+
+        page_num = 1
+        result_list = []
+
+        while True:
+
+            params = {
+                "query": query,
+                "language": "en-US",
+                "include_adult": False
+            }
+
+            status, output = self.__request("GET", url, params=params)
+            if not status:
+                return False, output
+
+            results = output.get("results", [])
+            result_list.extend(results)
+
+            total_pages = output.get("total_pages", 0)
+
+            if page_num >= min(max_pages, total_pages):
+                return True, result_list
+
+            page_num += 1
 
 
     ##############################
@@ -229,3 +432,13 @@ class TMDB_REST_API_Client():
             return False, f'Error while decoding content: {E}'
 
         return True, data_dict
+
+
+if __name__ == "__main__":
+
+    tmdb = TMDB_REST_API_Client(host="api.themoviedb.org", api_ver="3")
+
+    status, output = tmdb.get_trending_tvs()
+    if not status:
+        log.error(output)
+        sys.exit(2)

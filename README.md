@@ -48,3 +48,5 @@ i want to be able to use name to access the API: http://moviepulse --> should po
 use cozyla to load the web page
 
 Api service - send new movies to discord
+
+my wife is a big fan of marvel movies - send email when a marvel movie is released

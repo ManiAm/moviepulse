@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TV Show Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+    <main id="tv-detail">
+        <h2>Loading TV show info...</h2>
+    </main>
+
+    <section id="tv-credits">
+        <h3>Cast & Crew</h3>
+        <div class="credits-scroll" id="tv-credits-container">
+            <!-- Cast will be injected -->
+        </div>
+    </section>  
+
+    <script>
+        const tvId = {{ tv_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/tv_detail.js') }}"></script>
+
+</body>
+
+</html>

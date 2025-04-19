@@ -1,10 +1,46 @@
 
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Home</title>
-</head>
-<body>
-    <h1>MoviePulse Website</h1>
-</body>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>MoviePulse</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
+
+    <body>
+        <header>
+            <h1>🎬 MoviePulse</h1>
+            <p>Discover trending movies and shows powered by TMDb</p>
+            <input id="search-input" type="text" placeholder="Search movies, TV shows, or people..." />
+        </header>
+
+        <div id="search-results" class="movies-scroll" style="margin-top: 1rem;"></div>
+
+        <main id="movie-list">
+
+            <h2>Trending Movies</h2>
+            <div class="movies-scroll" id="movies-container">
+            </div>
+
+            <h2>Trending TV Shows</h2>
+            <div class="movies-scroll" id="tv-container"></div>
+
+            <h2>Popular Movies</h2>
+            <div class="movies-scroll" id="movies-popular"></div>
+
+            <h2>Upcoming Movies</h2>
+            <div class="movies-scroll" id="movies-upcoming"></div>
+
+            <h2>Top-rated Movies</h2>
+            <div class="movies-scroll" id="movies-top-rated"></div>
+
+            <h2>Adult Movies</h2>
+            <div class="movies-scroll" id="movies-adults"></div>
+
+        </main>
+
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </body>
+
 </html>

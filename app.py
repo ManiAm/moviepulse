@@ -5,11 +5,11 @@
 # Email: mani.amoozadeh2@gmail.com
 # Description: Flask app serving moviePulse
 
-import sys
 import logging
 from dotenv import load_dotenv
 from tmdb_client import TMDB_REST_API_Client
 from flask import Flask, render_template, Blueprint
+from flask import request
 from flask_restx import Api, Resource
 
 import models_sql
@@ -34,6 +34,14 @@ web_bp = Blueprint("web", __name__, template_folder="templates")
 @web_bp.route("/")
 def home():
     return render_template("index.html")
+
+@web_bp.route("/movie/<int:movie_id>")
+def movie_detail_page(movie_id):
+    return render_template("movie_detail.html", movie_id=movie_id)
+
+@web_bp.route("/tv/<int:tv_id>")
+def tv_detail_page(tv_id):
+    return render_template("tv_detail.html", tv_id=tv_id)
 
 # Register blueprint for web routes
 app.register_blueprint(web_bp)
@@ -82,14 +90,88 @@ class MovieCredits(Resource):
             return {"error": result}, 500
         return result
 
-@ns.route("/trending/tv")
-class TrendingTV(Resource):
-    def get(self):
-        url = f"{tmdb.baseurl}/trending/tv/day"
-        status, result = tmdb._TMDB_REST_API_Client__request("GET", url)
+@ns.route("/movie/<int:movie_id>/videos")
+class MovieVideos(Resource):
+    def get(self, movie_id):
+        status, result = tmdb.get_movie_video(movie_id)
         if not status:
             return {"error": result}, 500
         return result
+
+#####################################
+
+@ns.route("/trending/tv")
+class TrendingTV(Resource):
+    def get(self):
+        status, result = tmdb.get_trending_tvs()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/tv/<int:tv_id>")
+class TvDetail(Resource):
+    def get(self, tv_id):
+        status, result = tmdb.get_tv_detail(tv_id)
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/tv/<int:tv_id>/credits")
+class TvCredits(Resource):
+    def get(self, tv_id):
+        status, result = tmdb.get_tv_credit(tv_id)
+        if not status:
+            return {"error": result}, 500
+        return result
+
+#####################################
+
+@ns.route("/discover/popular")
+class DiscoverPopular(Resource):
+    def get(self):
+        status, result = tmdb.get_movies_popular()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/discover/upcoming")
+class DiscoverUpcoming(Resource):
+    def get(self):
+        status, result = tmdb.get_movies_upcoming()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/discover/top_rated")
+class DiscoverTopRated(Resource):
+    def get(self):
+        status, result = tmdb.get_movies_top_rated()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/discover/adults")
+class DiscoverAdults(Resource):
+    def get(self):
+        status, result = tmdb.get_movies_adults()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+#####################################
+
+@ns.route("/search")
+class Search(Resource):
+    def get(self):
+        query = request.args.get("query")
+        if not query:
+            return {"error": "Missing search query"}, 400
+        status, result = tmdb.search(query)
+        if not status:
+            return {"error": result}, 500
+        return result
+
+#####################################
 
 @ns.route("/health")
 class HealthCheck(Resource):
@@ -113,30 +195,6 @@ class HealthCheck(Resource):
 
 #####################################
 
-def _debug(tmdb):
-
-    status, output = tmdb.discover_movies()
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = tmdb.get_trending_movies()
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = tmdb.get_movie_detail(movie_id=950387)
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-    status, output = tmdb.get_movie_credit(movie_id=950387)
-    if not status:
-        log.error(output)
-        sys.exit(2)
-
-#####################################
-
 if __name__ == "__main__":
 
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

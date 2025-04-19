@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+    <main id="movie-detail">
+        <h2>Loading movie info...</h2>
+    </main>
+
+    <div id="trailer-container"></div>
+
+    <section id="movie-credits">
+        <h3>Cast & Crew</h3>
+        <div class="credits-scroll" id="credits-container">
+            <!-- Credits will be dynamically inserted -->
+        </div>
+    </section>   
+
+    <script>
+        const movieId = {{ movie_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/movie_detail.js') }}"></script>
+
+    <div id="trailer-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="close-trailer" style="cursor:pointer;font-size:2rem;">&times;</span>
+            <iframe id="trailer-frame" width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+</body>
+
+</html>
