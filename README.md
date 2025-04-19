@@ -16,18 +16,18 @@ To improve response time and reduce redundant calls, Flask leverages an in-memor
 
 The project structure looks like:
 
-    /moviepulse/
-    ├── backend/
-    │   ├── app.py
-    │   ├── docker-compose.yml
-    │   ├── models_redis.py
-    │   ├── tmdb_client.py
-    │   ├── requirements.txt
-    │   └── .env  --> API token
-    ├── frontend/
-        ├── index.html
-        ├── script.js
-        ├── styles.css
+    moviepulse/
+        ├── app.py
+        ├── docker-compose.yml
+        ├── models_redis.py
+        ├── tmdb_client.py
+        ├── requirements.txt
+        ├── .env  --> API token
+        ├── templates/
+        |   ├── index.html
+        ├── static/
+        │   ├── css
+        │   └── js
 
 
 ------------------------------
