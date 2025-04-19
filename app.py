@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# File: app.py
 # Author: Mani Amoozadeh
 # Email: mani.amoozadeh2@gmail.com
 # Description: Flask app serving moviePulse
@@ -62,7 +61,53 @@ api = Api(app,
 ns = api.namespace("v1", description="")
 
 # Swagger docs: http://artemis.home:5000/api/docs
-# Base URL: http://artemis.home:5000/api/v1/
+# API Base URL: http://artemis.home:5000/api/v1/
+
+#####################################
+
+@ns.route("/health")
+class HealthCheck(Resource):
+    def get(self):
+        return {"status": "ok"}, 200
+
+#####################################
+
+@ns.route("/search")
+class Search(Resource):
+    def get(self):
+        query = request.args.get("query")
+        if not query:
+            return {"error": "Missing search query"}, 400
+        status, result = tmdb.search(query)
+        if not status:
+            return {"error": result}, 500
+        return result
+
+#####################################
+
+@ns.route("/genres")
+class Genres(Resource):
+    def get(self):
+        status, result = tmdb.get_movie_genres()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/languages")
+class Languages(Resource):
+    def get(self):
+        status, result = tmdb.get_languages()
+        if not status:
+            return {"error": result}, 500
+        return result
+
+@ns.route("/regions")
+class Regions(Resource):
+    def get(self):
+        status, result = tmdb.get_countries()
+        if not status:
+            return {"error": result}, 500
+        return result
 
 #####################################
 
@@ -126,14 +171,6 @@ class TvCredits(Resource):
 
 #####################################
 
-@ns.route("/discover/popular")
-class DiscoverPopular(Resource):
-    def get(self):
-        status, result = tmdb.get_movies_popular()
-        if not status:
-            return {"error": result}, 500
-        return result
-
 @ns.route("/discover/upcoming")
 class DiscoverUpcoming(Resource):
     def get(self):
@@ -142,41 +179,55 @@ class DiscoverUpcoming(Resource):
             return {"error": result}, 500
         return result
 
+@ns.route("/discover/popular")
+class DiscoverPopular(Resource):
+    def get(self):
+
+        genres = request.args.get("with_genres")
+        languages = request.args.get("language")
+        regions = request.args.get("region")
+        year = request.args.get("year")
+
+        status, result = tmdb.get_movies_popular(with_genres=genres,
+                                                 with_original_language=languages,
+                                                 region=regions,
+                                                 primary_release_year=year)
+        if not status:
+            return {"error": result}, 500
+        return result
+
 @ns.route("/discover/top_rated")
 class DiscoverTopRated(Resource):
     def get(self):
-        status, result = tmdb.get_movies_top_rated()
+
+        genres = request.args.get("with_genres")
+        languages = request.args.get("language")
+        regions = request.args.get("region")
+        year = request.args.get("year")
+
+        status, result = tmdb.get_movies_top_rated(with_genres=genres,
+                                                   with_original_language=languages,
+                                                   region=regions,
+                                                   primary_release_year=year)
         if not status:
             return {"error": result}, 500
         return result
 
-@ns.route("/discover/adults")
-class DiscoverAdults(Resource):
+@ns.route("/discover/family_animation")
+class DiscoverFamilyAnimation(Resource):
     def get(self):
-        status, result = tmdb.get_movies_adults()
+        status, result = tmdb.get_movies_family_animation()
         if not status:
             return {"error": result}, 500
         return result
 
-#####################################
-
-@ns.route("/search")
-class Search(Resource):
+@ns.route("/discover/horror")
+class DiscoverFamilyAnimation(Resource):
     def get(self):
-        query = request.args.get("query")
-        if not query:
-            return {"error": "Missing search query"}, 400
-        status, result = tmdb.search(query)
+        status, result = tmdb.get_movies_horror()
         if not status:
             return {"error": result}, 500
         return result
-
-#####################################
-
-@ns.route("/health")
-class HealthCheck(Resource):
-    def get(self):
-        return {"status": "ok"}, 200
 
 #####################################
 

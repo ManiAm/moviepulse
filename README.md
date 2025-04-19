@@ -20,14 +20,16 @@ The project structure looks like:
 
     moviepulse/
         ├── app.py
-        ├── docker-compose.yml
+        ├── tmdb_client.py
         ├── models_redis.py
         ├── models_sql.py
-        ├── tmdb_client.py
         ├── requirements.txt
-        ├── .env  --> API token
+        ├── docker-compose.yml
+        ├── .env  ---> API token
         ├── templates/
         |   ├── index.html
+        |   ├── movie_detail.html
+        |   ├── tv_detail.html
         ├── static/
         │   ├── css
         │   └── js
@@ -35,17 +37,43 @@ The project structure looks like:
 
 ------------------------------
 
-adding a gif from dani playing with cozila and navigating
-
 nginx config
 
 swagger doc - picture
 
+add moviepulse.home into local DNS so that it redirects to artemis.home IP that is running NGINX
+
+- Web-page: http://moviepulse.home/
+- Swagger docs: http://moviepulse.home/api/docs
+- API Base URL: http://moviepulse.home/api/v1/
+
+------------------------------
+
 Frontend: HTML + CSS + JavaScript (fetch API)
 
-i want to be able to use name to access the API: http://moviepulse --> should point to artemis
+Sections in the page:
+
+trending movies
+trending tv shows
+upcoming movies
+popular movies
+top-rated movies
+horror movies
+family animations
+
+describe the difference between popular and top-rated from tmdb
+
+for popular movies and top-rated movies user can filter the contents based on genre, regions, year, etc.
+
+add a gif picture - adding multiple genre - year
 
 use cozyla to load the web page
+
+adding a gif from dani playing with cozila and navigating
+
+to find age-appropriate content for your 6-year-old son like cartoons or family movies.
+
+----------------------------
 
 Api service - send new movies to discord
 

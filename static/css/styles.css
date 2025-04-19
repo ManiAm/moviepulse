@@ -108,3 +108,21 @@ header {
     border-radius: 8px;
     border: 1px solid #ccc;
 }
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filter-form label {
+    margin-right: 0.25rem;
+}
+
+.filter-form select,
+.filter-form input[type="number"] {
+    min-width: 200px;
+    padding: 0.4rem;
+}

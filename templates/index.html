@@ -6,6 +6,7 @@
         <meta charset="UTF-8">
         <title>MoviePulse</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     </head>
 
     <body>
@@ -26,21 +27,69 @@
             <h2>Trending TV Shows</h2>
             <div class="movies-scroll" id="tv-container"></div>
 
-            <h2>Popular Movies</h2>
-            <div class="movies-scroll" id="movies-popular"></div>
-
-            <h2>Upcoming Movies</h2>
+            <h2>Upcoming Movies [API does not work!]</h2>
             <div class="movies-scroll" id="movies-upcoming"></div>
 
+            <!-- section -->
+
+            <h2>Popular Movies</h2>
+
+            <section class="movie-filter">
+                <form id="popular-filter-form">
+                    <label>Genres:</label>
+                    <select id="popular-genre-select" multiple></select>
+                
+                    <label>Languages:</label>
+                    <select id="popular-language-select" multiple></select>
+
+                    <label>Regions:</label>
+                    <select id="popular-region-select" multiple></select>
+
+                    <label>Year:</label>
+                    <input type="number" id="popular-year-input" placeholder="e.g. 2022" min="1900" max="2099" />
+                </form>
+            </section>
+            
+            <div class="movies-scroll" id="movies-popular"></div>
+            
+            <hr/>
+
+            <!-- section -->
+
             <h2>Top-rated Movies</h2>
+
+            <section class="movie-filter">
+              <form id="top-rated-filter-form">
+                <label>Genres:</label>
+                <select id="top-rated-genre-select" multiple></select>
+            
+                <label>Languages:</label>
+                <select id="top-rated-language-select" multiple></select>
+
+                <label>Regions:</label>
+                <select id="top-rated-region-select" multiple></select>
+
+                <label>Year:</label>
+                <input type="number" id="top-rated-year-input" placeholder="e.g. 2022" min="1900" max="2099" />
+              </form>
+            </section>
+            
             <div class="movies-scroll" id="movies-top-rated"></div>
 
-            <h2>Adult Movies</h2>
-            <div class="movies-scroll" id="movies-adults"></div>
+            <!-- section -->
+
+            <h2>Horror Movies</h2>
+            <div class="movies-scroll" id="movies-horror"></div>
+
+            <!-- section -->
+
+            <h2>Family Animations</h2>
+            <div class="movies-scroll" id="movies-family-animation"></div>
 
         </main>
 
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     </body>
 
 </html>
