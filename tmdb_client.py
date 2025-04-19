@@ -6,7 +6,6 @@ import json
 import logging
 import requests
 
-#import models_sql
 import models_redis
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -149,13 +148,6 @@ class TMDB_REST_API_Client():
 
     def get_movie_detail(self, movie_id, language="en-US"):
 
-        # session = models_sql.Session()
-
-        # # Check if movie_id is already cached in `movie_detail` table
-        # cached = session.query(models_sql.MovieDetail).filter_by(movie_id=movie_id).first()
-        # if cached:
-        #     return True, cached.data
-
         cached = models_redis.get_movie_detail(movie_id)
         if cached:
             return True, cached
@@ -166,11 +158,6 @@ class TMDB_REST_API_Client():
         status, output = self.__request("GET", url, params=params)
         if not status:
             return False, output
-
-        # Save result in DB
-        # new_entry = models_sql.MovieDetail(movie_id=movie_id, data=output)
-        # session.add(new_entry)
-        # session.commit()
 
         models_redis.save_movie_detail(movie_id, output)
 

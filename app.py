@@ -12,6 +12,8 @@ from tmdb_client import TMDB_REST_API_Client
 from flask import Flask, render_template, Blueprint
 from flask_restx import Api, Resource
 
+import models_sql
+
 #####################################
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -51,7 +53,7 @@ api = Api(app,
 # Define API Namespace
 ns = api.namespace("v1", description="")
 
-# Swagger: http://artemis.home:5000/api/docs
+# Swagger docs: http://artemis.home:5000/api/docs
 # Base URL: http://artemis.home:5000/api/v1/
 
 #####################################
@@ -93,6 +95,21 @@ class TrendingTV(Resource):
 class HealthCheck(Resource):
     def get(self):
         return {"status": "ok"}, 200
+
+#####################################
+
+        # session = models_sql.Session()
+
+        # # Check if movie_id is already cached in `movie_detail` table
+        # cached = session.query(models_sql.MovieDetail).filter_by(movie_id=movie_id).first()
+        # if cached:
+        #     return True, cached.data
+
+
+        # Save result in DB
+        # new_entry = models_sql.MovieDetail(movie_id=movie_id, data=output)
+        # session.add(new_entry)
+        # session.commit()
 
 #####################################
 

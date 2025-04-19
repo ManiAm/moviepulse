@@ -14,12 +14,15 @@ All movie and TV data is fetched from The Movie Database (TMDb) - [API Reference
 
 To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request. Redis is deployed in a Docker container to maintain state across reboots.
 
+While Redis is ideal for caching transient data, persistent user-related information—such as interaction logs, preferences, watch history, and session metadata—is stored in a PostgreSQL database. SQLAlchemy serves as the ORM layer, providing a clean and Pythonic interface to interact with the database.
+
 The project structure looks like:
 
     moviepulse/
         ├── app.py
         ├── docker-compose.yml
         ├── models_redis.py
+        ├── models_sql.py
         ├── tmdb_client.py
         ├── requirements.txt
         ├── .env  --> API token
@@ -36,13 +39,12 @@ adding a gif from dani playing with cozila and navigating
 
 nginx config
 
+swagger doc - picture
 
-- **Frontend**: HTML + CSS + JavaScript (fetch API)
-
+Frontend: HTML + CSS + JavaScript (fetch API)
 
 i want to be able to use name to access the API: http://moviepulse --> should point to artemis
 
 use cozyla to load the web page
-
 
 Api service - send new movies to discord
