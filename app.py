@@ -4,11 +4,13 @@
 # Email: mani.amoozadeh2@gmail.com
 # Description: Flask app serving moviePulse
 
+import os
 import logging
 from dotenv import load_dotenv
 from tmdb_client import TMDB_REST_API_Client
 from flask import Flask, render_template, Blueprint
 from flask import request
+from flask import send_from_directory
 from flask_restx import Api, Resource
 
 import models_sql
@@ -33,6 +35,11 @@ web_bp = Blueprint("web", __name__, template_folder="templates")
 @web_bp.route("/")
 def home():
     return render_template("index.html")
+
+# legacy browsers
+@web_bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @web_bp.route("/movie/<int:movie_id>")
 def movie_detail_page(movie_id):

@@ -1,4 +1,8 @@
 
+# Author: Mani Amoozadeh
+# Email: mani.amoozadeh2@gmail.com
+# Description: REST client for TMDb
+
 import os
 import sys
 import getpass

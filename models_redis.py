@@ -1,3 +1,8 @@
+
+# Author: Mani Amoozadeh
+# Email: mani.amoozadeh2@gmail.com
+# Description: model for interacting with Redis
+
 import redis
 import json
 import re

@@ -1,3 +1,8 @@
+
+# Author: Mani Amoozadeh
+# Email: mani.amoozadeh2@gmail.com
+# Description: model for interacting with Postgresql
+
 from sqlalchemy import create_engine, Column, Integer, String, JSON
 from sqlalchemy.orm import declarative_base, sessionmaker
 
