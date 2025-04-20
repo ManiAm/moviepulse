@@ -5,6 +5,7 @@ import getpass
 import json
 import logging
 import requests
+import inspect
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -60,7 +61,8 @@ class TMDB_REST_API_Client():
 
     def get_movie_certification(self):
 
-        cached = models_redis.get_movie_certification()
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -70,14 +72,15 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_movie_certification(output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
 
     def get_countries(self):
 
-        cached = models_redis.get_countries()
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -87,14 +90,15 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_countries(output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
 
     def get_languages(self):
 
-        cached = models_redis.get_languages()
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -104,14 +108,15 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_languages(output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
 
     def get_movie_genres(self):
 
-        cached = models_redis.get_movie_genres()
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -121,7 +126,7 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_movie_genres(output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
@@ -134,6 +139,11 @@ class TMDB_REST_API_Client():
         """
             time_window = day or week
         """
+
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
+        if cached:
+            return True, cached
 
         url = f"{self.baseurl}/trending/movie/{time_window}"
 
@@ -157,15 +167,24 @@ class TMDB_REST_API_Client():
             total_pages = output.get("total_pages", 0)
 
             if page_num >= min(max_pages, total_pages):
-                return True, result_list
+                break
 
             page_num += 1
+
+        models_redis.set_to_cache(frame, result_list)
+
+        return True, result_list
 
 
     def get_trending_tvs(self, language="en-US", time_window="day", max_pages=5):
         """
             time_window = day or week
         """
+
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
+        if cached:
+            return True, cached
 
         url = f"{self.baseurl}/trending/tv/{time_window}"
 
@@ -189,9 +208,13 @@ class TMDB_REST_API_Client():
             total_pages = output.get("total_pages", 0)
 
             if page_num >= min(max_pages, total_pages):
-                return True, result_list
+                break
 
             page_num += 1
+
+        models_redis.set_to_cache(frame, result_list)
+
+        return True, result_list
 
 
     ############################
@@ -200,7 +223,8 @@ class TMDB_REST_API_Client():
 
     def get_movie_detail(self, movie_id, language="en-US"):
 
-        cached = models_redis.get_movie_detail(movie_id)
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -211,14 +235,15 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_movie_detail(movie_id, output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
  
 
     def get_movie_credit(self, movie_id, language="en-US"):
 
-        cached = models_redis.get_movie_credit_detail(movie_id)
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -232,12 +257,17 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_movie_credit_detail(movie_id, output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
 
     def get_movie_video(self, movie_id, language="en-US"):
+
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
+        if cached:
+            return True, cached
 
         url = f"{self.baseurl}/movie/{movie_id}/videos"
 
@@ -251,6 +281,8 @@ class TMDB_REST_API_Client():
 
         results = output.get("results", [])
 
+        models_redis.set_to_cache(frame, results)
+
         return True, results
 
 
@@ -260,7 +292,8 @@ class TMDB_REST_API_Client():
 
     def get_tv_detail(self, tv_id, language="en-US"):
 
-        cached = models_redis.get_tv_detail(tv_id)
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -271,14 +304,15 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_tv_detail(tv_id, output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
  
 
     def get_tv_credit(self, tv_id, language="en-US"):
 
-        cached = models_redis.get_tv_credit_detail(tv_id)
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
         if cached:
             return True, cached
 
@@ -292,7 +326,7 @@ class TMDB_REST_API_Client():
         if not status:
             return False, output
 
-        models_redis.save_tv_credit_detail(tv_id, output)
+        models_redis.set_to_cache(frame, output)
 
         return True, output
 
@@ -363,6 +397,11 @@ class TMDB_REST_API_Client():
             | 37       | Western           |
         """
 
+        frame = inspect.currentframe()
+        cached = models_redis.get_from_cache(frame)
+        if cached:
+            return True, cached
+
         url = f"{self.baseurl}/discover/movie"
 
         page_num = 1
@@ -399,9 +438,13 @@ class TMDB_REST_API_Client():
             total_pages = output.get("total_pages", 0)
 
             if page_num >= min(max_pages, total_pages):
-                return True, result_list
+                break
 
             page_num += 1
+
+        models_redis.set_to_cache(frame, result_list)
+
+        return True, result_list
 
 
     #####################################
@@ -504,9 +547,11 @@ class TMDB_REST_API_Client():
             total_pages = output.get("total_pages", 0)
 
             if page_num >= min(max_pages, total_pages):
-                return True, result_list
+                break
 
             page_num += 1
+
+        return True, result_list
 
 
     ##############################
