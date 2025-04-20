@@ -1,0 +1,21 @@
+[Unit]
+Description=MoviePulse Gunicorn Service
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/opt/rp_cluster/moviepulse
+ExecStart=/home/admin/venv_moviePulse/bin/gunicorn app:app \
+    --workers 4 \
+    --bind 127.0.0.1:8000 \
+    --timeout 120 \
+    --log-level info
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=moviepulse
+
+[Install]
+WantedBy=multi-user.target

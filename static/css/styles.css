@@ -23,6 +23,8 @@ header {
     padding-bottom: 1rem;
     scrollbar-width: thin;
     scrollbar-color: #ccc transparent;
+    position: relative;
+    overflow-y: hidden;
 }
 
 .movies-scroll::-webkit-scrollbar {
@@ -36,6 +38,8 @@ header {
 
 .movie-card {
     position: relative;
+    isolation: isolate;
+    z-index: 0;
     min-width: 200px;
     max-width: 200px;
     background: white;
@@ -157,4 +161,26 @@ header {
 .filter-form input[type="number"] {
     min-width: 200px;
     padding: 0.4rem;
+}
+
+.season-card {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.season-poster {
+    width: 100px;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+    display: block;
+}
+
+.season-poster-placeholder {
+    width: 100px;
+    aspect-ratio: 2 / 3;
+    background-color: #ccc;
+    border-radius: 4px;
 }

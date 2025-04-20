@@ -7,11 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             document.getElementById("tv-title").textContent = data.name;
             const infoContainer = document.getElementById("tv-info-container");
-            
+
             const poster = data.poster_path
                 ? `<img src="https://image.tmdb.org/t/p/w500${data.poster_path}" alt="${data.name}" style="max-width: 300px; border-radius: 8px;">`
                 : `<div>No Image</div>`;
-            
+
             const genres = data.genres?.map(g => g.name).join(", ") || "N/A";
             const countries = data.origin_country?.join(", ") || "N/A";
             const homepage = data.homepage ? `<a href="${data.homepage}" target="_blank">${data.homepage}</a>` : "N/A";
@@ -23,11 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const seasonsHTML = data.seasons?.map(season => {
                 const seasonPoster = season.poster_path
-                    ? `<img src="https://image.tmdb.org/t/p/w185${season.poster_path}" alt="${season.name}" style="max-width: 100px; border-radius: 4px;">`
-                    : `<div style="width:100px;height:150px;background:#ccc;border-radius:4px;"></div>`;
-            
+                    ? `<img src="https://image.tmdb.org/t/p/w185${season.poster_path}" alt="${season.name}" class="season-poster">`
+                    : `<div class="season-poster-placeholder"></div>`;
+
                 return `
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="season-card">
                         ${seasonPoster}
                         <div>
                             <h4>${season.name}</h4>

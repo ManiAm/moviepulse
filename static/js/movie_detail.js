@@ -18,14 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const poster = data.poster_path
             ? `<img src="https://image.tmdb.org/t/p/w500${data.poster_path}" alt="${data.title}" style="max-width: 300px; border-radius: 8px;">`
             : `<div>No Image</div>`;
-        
+
             const genres = data.genres?.map(g => g.name).join(", ") || "N/A";
             const countries = data.production_countries?.map(c => c.name).join(", ") || "N/A";
             const homepage = data.homepage ? `<a href="${data.homepage}" target="_blank">${data.homepage}</a>` : "N/A";
             const imdb = data.imdb_id ? `<a href="https://www.imdb.com/title/${data.imdb_id}" target="_blank">${data.imdb_id}</a>` : "N/A";
             const budget = data.budget ? currencyFormat.format(data.budget) : "N/A";
             const revenue = data.revenue ? currencyFormat.format(data.revenue) : "N/A";
-            
+
             infoContainer.innerHTML = `
                 ${poster}
                 <p><strong>Status:</strong> ${data.status}</p>

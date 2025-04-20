@@ -7,13 +7,14 @@
 import os
 import logging
 from dotenv import load_dotenv
-from tmdb_client import TMDB_REST_API_Client
+from sqlalchemy.exc import IntegrityError
+
 from flask import Flask, render_template, Blueprint
 from flask import request
 from flask import send_from_directory
 from flask_restx import Api, Resource
-from sqlalchemy.exc import IntegrityError
 
+from tmdb_client import TMDB_REST_API_Client
 import models_sql
 
 #####################################
