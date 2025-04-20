@@ -4,21 +4,20 @@
 # Description: REST client for TMDb
 
 import os
-import sys
 import getpass
-import json
 import logging
-import requests
 import inspect
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+from rest_client import REST_API_Client
 import models_redis
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger(__name__)
 
-class TMDB_REST_API_Client():
+
+class TMDB_REST_API_Client(REST_API_Client):
 
     def __init__(self,
                  host=None,
@@ -27,32 +26,7 @@ class TMDB_REST_API_Client():
                  base=None,
                  user=getpass.getuser()):
 
-        if not host:
-            log.error("host is missing!")
-            sys.exit(2)
-
-        if not TMDB_REST_API_Client.__with_http_prefix(host):
-            host_address = f'https://{host}'
-        else:
-            host_address = host
-
-        if port:
-            host_address += f':{port}'
-
-        self.baseurl = f'{host_address}'
-
-        if api_ver:
-            self.baseurl += f'/{api_ver}'
-
-        if base:
-            self.baseurl += f'/{base}'
-
-        self.user = user
-
-        self.headers = {
-            'Content-Type': 'application/json',
-            'accept': 'application/json',
-        }
+        super().__init__(host, port, api_ver, base, user)
 
         access_token = os.getenv('TMDB_API_TOKEN', None)
         if access_token:
@@ -72,7 +46,7 @@ class TMDB_REST_API_Client():
 
         url = f"{self.baseurl}/certification/movie/list"
 
-        status, output = self.__request("GET", url)
+        status, output = self.request("GET", url)
         if not status:
             return False, output
 
@@ -90,7 +64,7 @@ class TMDB_REST_API_Client():
 
         url = f"{self.baseurl}/configuration/countries"
 
-        status, output = self.__request("GET", url)
+        status, output = self.request("GET", url)
         if not status:
             return False, output
 
@@ -108,7 +82,7 @@ class TMDB_REST_API_Client():
 
         url = f"{self.baseurl}/configuration/languages"
 
-        status, output = self.__request("GET", url)
+        status, output = self.request("GET", url)
         if not status:
             return False, output
 
@@ -126,7 +100,7 @@ class TMDB_REST_API_Client():
 
         url = f"{self.baseurl}/genre/movie/list"
 
-        status, output = self.__request("GET", url)
+        status, output = self.request("GET", url)
         if not status:
             return False, output
 
@@ -161,7 +135,7 @@ class TMDB_REST_API_Client():
                 "language": language
             }
 
-            status, output = self.__request("GET", url, params=params)
+            status, output = self.request("GET", url, params=params)
             if not status:
                 return False, output
 
@@ -202,7 +176,7 @@ class TMDB_REST_API_Client():
                 "language": language
             }
 
-            status, output = self.__request("GET", url, params=params)
+            status, output = self.request("GET", url, params=params)
             if not status:
                 return False, output
 
@@ -235,14 +209,14 @@ class TMDB_REST_API_Client():
         url = f"{self.baseurl}/movie/{movie_id}"
         params = {"language": language}
 
-        status, output = self.__request("GET", url, params=params)
+        status, output = self.request("GET", url, params=params)
         if not status:
             return False, output
 
         models_redis.set_to_cache(frame, output)
 
         return True, output
- 
+
 
     def get_movie_credit(self, movie_id, language="en-US"):
 
@@ -257,7 +231,7 @@ class TMDB_REST_API_Client():
             "language": language
         }
 
-        status, output = self.__request("GET", url, params=params)
+        status, output = self.request("GET", url, params=params)
         if not status:
             return False, output
 
@@ -279,7 +253,7 @@ class TMDB_REST_API_Client():
             "language": language
         }
 
-        status, output = self.__request("GET", url, params=params)
+        status, output = self.request("GET", url, params=params)
         if not status:
             return False, output
 
@@ -304,14 +278,14 @@ class TMDB_REST_API_Client():
         url = f"{self.baseurl}/tv/{tv_id}"
         params = {"language": language}
 
-        status, output = self.__request("GET", url, params=params)
+        status, output = self.request("GET", url, params=params)
         if not status:
             return False, output
 
         models_redis.set_to_cache(frame, output)
 
         return True, output
- 
+
 
     def get_tv_credit(self, tv_id, language="en-US"):
 
@@ -326,7 +300,7 @@ class TMDB_REST_API_Client():
             "language": language
         }
 
-        status, output = self.__request("GET", url, params=params)
+        status, output = self.request("GET", url, params=params)
         if not status:
             return False, output
 
@@ -432,7 +406,7 @@ class TMDB_REST_API_Client():
                 "vote_count.lte": vote_count_lte
             }
 
-            status, output = self.__request("GET", url, params=params)
+            status, output = self.request("GET", url, params=params)
             if not status:
                 return False, output
 
@@ -475,7 +449,11 @@ class TMDB_REST_API_Client():
                                     release_date_lte=three_months_str)
 
 
-    def get_movies_popular(self, with_genres=None, with_original_language=None, region=None, primary_release_year=None):
+    def get_movies_popular(self,
+                           with_genres=None,
+                           with_original_language=None,
+                           region=None,
+                           primary_release_year=None):
 
         return self.discover_movies(include_adult=False,
                                     include_video=False,
@@ -488,7 +466,11 @@ class TMDB_REST_API_Client():
                                     primary_release_year=primary_release_year)
 
 
-    def get_movies_top_rated(self, with_genres=None, with_original_language=None, region=None, primary_release_year=None):
+    def get_movies_top_rated(self,
+                             with_genres=None,
+                             with_original_language=None,
+                             region=None,
+                             primary_release_year=None):
 
         return self.discover_movies(include_adult=False,
                                     include_video=False,
@@ -542,7 +524,7 @@ class TMDB_REST_API_Client():
                 "page": page_num
             }
 
-            status, output = self.__request("GET", url, params=params)
+            status, output = self.request("GET", url, params=params)
             if not status:
                 return False, output
 
@@ -560,58 +542,6 @@ class TMDB_REST_API_Client():
         result_list.sort(key=lambda x: x.get("popularity", 0), reverse=True)
 
         return True, result_list
-
-
-    ##############################
-    ####### Helper Methods #######
-    ##############################
-
-    @staticmethod
-    def __with_http_prefix(host):
-
-        if host.startswith("http://"):
-            return True
-
-        if host.startswith("https://"):
-            return True
-
-        return False
-
-
-    def __request(self, method, url, timeout=10, verify=True, stream=False, decode=True, **kwargs):
-
-        try:
-            response = requests.request(method,
-                                        url,
-                                        headers=self.headers,
-                                        timeout=timeout,
-                                        verify=verify,
-                                        stream=stream,
-                                        **kwargs)
-        except Exception as E:
-            return False, str(E)
-
-        try:
-            response.raise_for_status()
-        except Exception as E:
-            return False, f'Return code={response.status_code}, {E}\n{response.text}'
-
-        if stream:
-            return True, response
-
-        if not decode:
-            return True, response.content
-
-        try:
-            content_decoded = response.content.decode('utf-8')
-            if not content_decoded:
-                return True, {}
-
-            data_dict = json.loads(content_decoded)
-        except Exception as E:
-            return False, f'Error while decoding content: {E}'
-
-        return True, data_dict
 
 
 if __name__ == "__main__":

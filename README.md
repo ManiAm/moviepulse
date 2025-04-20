@@ -22,9 +22,12 @@ The project structure looks like:
 
     moviepulse/
         ├── app.py
+        ├── rest_client.py
         ├── tmdb_client.py
         ├── models_redis.py
         ├── models_sql.py
+        ├── discord_webhook.py
+        ├── movie_announcer.py
         ├── requirements.txt
         ├── docker-compose.yml
         ├── .env  ---> API token
@@ -165,16 +168,8 @@ MoviePulse offers a dynamic search feature that allows users to quickly find mov
 
 Users can easily mark their favorite movies or TV shows by clicking the heart icon on each title card. Once marked, the selected title is added to the user’s Favorites list, allowing for quick access and personalized content tracking.
 
-----------------------------
+## Movie Digest (via Discord)
 
-use cozyla to load the web page
+MoviePulse automatically posts a curated list of upcoming movie releases to a designated Discord channel every week. This way, our family stays up to date with the latest upcoming movie releases—making it easy to plan movie nights in advance or mark our calendars for exciting premieres. Whether it’s a highly anticipated blockbuster or a cozy family animation, MoviePulse helps ensure we never miss a release we're looking forward to.
 
-adding a gif from dani playing with cozila and navigating
-
-to find age-appropriate content for your 6-year-old son like cartoons or family movies.
-
-----------------------------
-
-Api service - send new movies to discord
-
-my wife is a big fan of marvel movies - send email when a marvel movie is released
+<img src="pics/upcoming.jpg" alt="segment" width="400">
