@@ -153,20 +153,17 @@ The main page is organized into several content-rich sections, each populated dy
 
 Clicking on any movie or TV show card navigates the user to a dedicated details page for that title. This page provides comprehensive information retrieved from the TMDB API. This detailed view allows users to explore each title in depth, offering a richer and more engaging discovery experience beyond the main listing pages.
 
+<img src="pics/detail.gif" alt="segment">
+
 For Popular Movies and Top-Rated Movies, the frontend provides advanced filtering options that allow users to tailor results based on: Genre, Language, Region, and Year of Release. These filters are implemented using multi-select dropdowns and input fields, providing flexibility in content discovery.
 
-TODO: add a gif picture - adding multiple genre - year
+<img src="pics/filter.gif" alt="segment">
 
+MoviePulse offers a dynamic search feature that allows users to quickly find movies and TV shows. As users type in the search bar, real-time suggestions are displayed based on the input. This live search experience enhances usability by providing instant feedback and reducing the time needed to locate specific titles.
 
+<img src="pics/search.gif" alt="segment">
 
-
-
-
-----------------------------
-
-search movie and tv shows - as you type live result (John Wick)
-
-clicking on the heart will add that title into favorite
+Users can easily mark their favorite movies or TV shows by clicking the heart icon on each title card. Once marked, the selected title is added to the user’s Favorites list, allowing for quick access and personalized content tracking.
 
 ----------------------------
 
