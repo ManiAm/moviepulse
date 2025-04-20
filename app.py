@@ -12,6 +12,7 @@ from flask import Flask, render_template, Blueprint
 from flask import request
 from flask import send_from_directory
 from flask_restx import Api, Resource
+from sqlalchemy.exc import IntegrityError
 
 import models_sql
 
@@ -48,6 +49,13 @@ def movie_detail_page(movie_id):
 @web_bp.route("/tv/<int:tv_id>")
 def tv_detail_page(tv_id):
     return render_template("tv_detail.html", tv_id=tv_id)
+
+@web_bp.route("/favorites")
+def show_favorites():
+    session = models_sql.Session()
+    favorites = session.query(models_sql.Favorite).filter_by(username="guest").all()
+    session.close()
+    return render_template("favorites.html", favorites=favorites)
 
 # Register blueprint for web routes
 app.register_blueprint(web_bp)
@@ -238,21 +246,67 @@ class DiscoverFamilyAnimation(Resource):
 
 #####################################
 
-        # session = models_sql.Session()
+@ns.route("/favorites")
+class FavoriteList(Resource):
 
-        # # Check if movie_id is already cached in `movie_detail` table
-        # cached = session.query(models_sql.MovieDetail).filter_by(movie_id=movie_id).first()
-        # if cached:
-        #     return True, cached.data
+    def get(self):
+        """Get list of favorite items for the guest user"""
+        session = models_sql.Session()
+        favs = session.query(models_sql.Favorite).filter_by(username="guest").all()
+        session.close()
+        return [ {"tmdb_id": f.tmdb_id, "media_type": f.media_type} for f in favs ]
 
+    def post(self):
+        """Add an item to favorites"""
+        data = request.json
+        session = models_sql.Session()
+        fav = models_sql.Favorite(
+            username="guest",
+            tmdb_id=data["tmdb_id"],
+            media_type=data["media_type"]
+        )
+        session.add(fav)
 
-        # Save result in DB
-        # new_entry = models_sql.MovieDetail(movie_id=movie_id, data=output)
-        # session.add(new_entry)
-        # session.commit()
+        try:
+            session.commit()
+            return {
+                "success": True,
+                "favorite": {
+                    "tmdb_id": fav.tmdb_id,
+                    "media_type": fav.media_type
+                }
+            }, 201
+        except IntegrityError:
+            session.rollback()
+            return {"message": "Item already in favorites."}, 200
+        finally:
+            session.close()
+
+    def delete(self):
+        """Remove an item from favorites"""
+        data = request.json
+        session = models_sql.Session()
+        fav = session.query(models_sql.Favorite).filter_by(
+            username="guest",
+            tmdb_id=data["tmdb_id"],
+            media_type=data["media_type"]
+        ).first()
+
+        if fav:
+            session.delete(fav)
+            session.commit()
+            result = {"success": True, "message": "Item removed from favorites."}
+        else:
+            result = {"success": False, "message": "Item not found in favorites."}
+
+        session.close()
+        return result, 200
 
 #####################################
 
 if __name__ == "__main__":
+
+    models_sql.init_db()
+    print("Database initialized.")
 
     app.run(debug=True, host="0.0.0.0", port=5000)

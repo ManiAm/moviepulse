@@ -538,7 +538,8 @@ class TMDB_REST_API_Client():
             params = {
                 "query": query,
                 "language": "en-US",
-                "include_adult": False
+                "include_adult": False,
+                "page": page_num
             }
 
             status, output = self.__request("GET", url, params=params)
@@ -554,6 +555,9 @@ class TMDB_REST_API_Client():
                 break
 
             page_num += 1
+
+        # Sort by popularity descending
+        result_list.sort(key=lambda x: x.get("popularity", 0), reverse=True)
 
         return True, result_list
 

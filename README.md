@@ -30,6 +30,7 @@ The project structure looks like:
         |   ├── index.html
         |   ├── movie_detail.html
         |   ├── tv_detail.html
+        |   ├── favorites.html
         ├── static/
         │   ├── css
         │   └── js

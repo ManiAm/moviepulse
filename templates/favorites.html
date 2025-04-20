@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Favorites - MoviePulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>❤️ My Favorites</h1>
+        <a href="/">← Back to Home</a>
+    </header>
+
+    <div class="movies-scroll">
+        {% for fav in favorites %}
+
+        <a href="/{{ fav.media_type }}/{{ fav.tmdb_id }}" style="text-decoration: none; color: inherit;">
+            <div class="movie-card" data-id="{{ fav.tmdb_id }}" data-type="{{ fav.media_type }}">
+                <span class="favorite-heart">❤️</span>
+                <h3 class="media-title">Loading...</h3>
+            </div>
+        </a> 
+
+        {% endfor %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

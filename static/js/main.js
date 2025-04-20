@@ -1,4 +1,3 @@
-// static/js/main.js
 
 function debounce(fn, delay) {
     let timeout;
@@ -7,6 +6,45 @@ function debounce(fn, delay) {
         timeout = setTimeout(() => fn(...args), delay);
     };
 }
+
+const favoriteList = new Set();
+
+function loadFavorites() {
+    fetch('/api/v1/favorites')
+        .then(res => res.json())
+        .then(favs => {
+            favs.forEach(f => {
+                favoriteList.add(`${f.media_type}:${f.tmdb_id}`);
+                const card = document.querySelector(`.movie-card[data-id="${f.tmdb_id}"][data-type="${f.media_type}"]`);
+                if (card) card.querySelector(".favorite-heart").textContent = "❤️";
+            });
+        });
+}
+
+// clicking on the heart
+function toggleFavorite(el) {
+    const card = el.closest(".movie-card");
+    const tmdb_id = card.dataset.id;
+    const media_type = card.dataset.type;
+    const key = `${media_type}:${tmdb_id}`;
+
+    const isFavorite = favoriteList.has(key);
+
+    fetch('/api/v1/favorites', {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tmdb_id, media_type })
+    }).then(() => {
+        if (isFavorite) {
+            favoriteList.delete(key);
+            el.textContent = "🤍";
+        } else {
+            favoriteList.add(key);
+            el.textContent = "❤️";
+        }
+    });
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -49,10 +87,15 @@ document.addEventListener("DOMContentLoaded", () => {
     
             const card = document.createElement("div");
             card.className = "movie-card";
+
             const image = item.poster_path || item.profile_path;
             const title = item.title || item.name;
             const type = item.media_type;
     
+            card.id = `search-${item.id}`;
+            card.setAttribute("data-id", item.id);
+            card.setAttribute("data-type", type);
+
             const poster = `<img src="https://image.tmdb.org/t/p/w500${image}" alt="${title}">`;
     
             let href = "#";
@@ -60,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
             else if (type === "tv") href = `/tv/${item.id}`;
     
             card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="${href}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${title}</h3>
@@ -73,9 +117,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 sessionStorage.setItem("clickedCardId", `search-${item.id}`);
             });
     
-            card.id = `search-${item.id}`;
             resultsContainer.appendChild(card);
         });
+
+        loadFavorites();
+
     }, 400)); // debounce to avoid API spamming
 
     //////////////////////////////////////////////////////////////
@@ -89,12 +135,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = document.createElement("div");
                 card.className = "movie-card";
                 card.id = `movie-${movie.id}`;
+                card.setAttribute("data-id", movie.id);
+                card.setAttribute("data-type", "movie");
 
                 const poster = movie.poster_path 
                     ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">`
                     : `<div>No Image</div>`;
 
                 card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="/movie/${movie.id}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${movie.title}</h3>
@@ -126,12 +175,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = document.createElement("div");
                 card.className = "movie-card";
                 card.id = `tv-${tv.id}`;
+                card.setAttribute("data-id", tv.id);
+                card.setAttribute("data-type", "tv");
 
                 const poster = tv.poster_path
                     ? `<img src="https://image.tmdb.org/t/p/w500${tv.poster_path}" alt="${tv.name}">`
                     : `<div>No Image</div>`;
 
                 card.innerHTML = `
+                    <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                     <a href="/tv/${tv.id}" style="text-decoration: none; color: inherit;">
                         ${poster}
                         <h3>${tv.name}</h3>
@@ -160,12 +212,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = document.createElement("div");
                 card.className = "movie-card";
                 card.id = `movie-upcoming-${movie.id}`;
+                card.setAttribute("data-id", movie.id);
+                card.setAttribute("data-type", "movie");
 
                 const poster = movie.poster_path 
                     ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">`
                     : `<div>No Image</div>`;
 
                 card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="/movie/${movie.id}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${movie.title}</h3>
@@ -331,12 +386,15 @@ document.addEventListener("DOMContentLoaded", () => {
               const card = document.createElement("div");
               card.className = "movie-card";
               card.id = `${cardIdPrefix}-${movie.id}`;
-      
+              card.setAttribute("data-id", movie.id);
+              card.setAttribute("data-type", "movie");
+
               const poster = movie.poster_path 
                 ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">`
                 : `<div>No Image</div>`;
       
               card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="/movie/${movie.id}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${movie.title}</h3>
@@ -380,12 +438,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = document.createElement("div");
                 card.className = "movie-card";
                 card.id = `movie-horror-${movie.id}`;
+                card.setAttribute("data-id", movie.id);
+                card.setAttribute("data-type", "movie");
 
                 const poster = movie.poster_path 
                     ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">`
                     : `<div>No Image</div>`;
 
                 card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="/movie/${movie.id}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${movie.title}</h3>
@@ -418,12 +479,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const card = document.createElement("div");
                 card.className = "movie-card";
                 card.id = `movie-family-animation-${movie.id}`;
+                card.setAttribute("data-id", movie.id);
+                card.setAttribute("data-type", "movie");
 
                 const poster = movie.poster_path 
                     ? `<img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">`
                     : `<div>No Image</div>`;
 
                 card.innerHTML = `
+                <span class="favorite-heart" onclick="toggleFavorite(this)">🤍</span>
                 <a href="/movie/${movie.id}" style="text-decoration: none; color: inherit;">
                     ${poster}
                     <h3>${movie.title}</h3>
@@ -444,5 +508,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => {
             console.error("Failed to fetch trending movies", err);
         });
+
+    //////////////////////////////////////////////////////////////
+
+    loadFavorites();
 
 });
