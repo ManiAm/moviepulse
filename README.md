@@ -12,13 +12,13 @@ Since Flask’s built-in development server is not suitable for production use, 
 
 All movie and TV data is fetched from The Movie Database (TMDb) - [API Reference](https://developer.themoviedb.org/reference/intro/getting-started). It provides a robust and well-documented REST API for accessing a wide range of metadata including trending content, credits, release information, etc.
 
-To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request. Redis is deployed in a Docker container to maintain state across reboots.
+To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request.
 
 While Redis is ideal for caching transient data, persistent user-related information—such as interaction logs, preferences, watch history, and session metadata—is stored in a PostgreSQL database. SQLAlchemy serves as the ORM layer, providing a clean and Pythonic interface to interact with the database.
 
 ## Project Structure
 
-The project structure looks like:
+The project structure looks like this:
 
     moviepulse/
         ├── app.py
@@ -30,7 +30,7 @@ The project structure looks like:
         ├── movie_announcer.py
         ├── requirements.txt
         ├── docker-compose.yml
-        ├── .env  ---> API token
+        ├── .env  ---> Private API token
         ├── templates/
         |   ├── index.html
         |   ├── movie_detail.html
@@ -39,6 +39,8 @@ The project structure looks like:
         ├── static/
         │   ├── css
         │   └── js
+
+Nginx is configured as a reverse proxy and is forwarding requests to the Gunicorn server. 
 
 ```text
 # nginx.conf
@@ -89,15 +91,9 @@ Sample output is:
 [2025-04-20 00:08:08 -0700] [2164482] [INFO] Booting worker with pid: 2164482
 ```
 
-Option `--workers 4` runs 4 worker processes to handle requests.
+Option `--workers 4` runs 4 worker processes to handle requests. More workers mean better handling of concurrent requests but higher resource usage. Option `--bind 127.0.0.1:8000` binds the server to 127.0.0.1 (localhost) on port 8000. This means the server is only accessible from the local machine.
 
-More workers mean better handling of concurrent requests but higher resource usage.
-
-Option `--bind 127.0.0.1:8000` binds the server to 127.0.0.1 (localhost) on port 8000.
-
-This means the server is only accessible from the local machine.
-
-Gunicorn offers several worker types, including synchronous (sync), threaded, asynchronous, and multiprocessing workers. For this deployment, I’m using the default sync worker, which is well-suited for lightweight applications with low concurrency requirements. Nginx is configured as a reverse proxy and is now successfully forwarding requests to the Gunicorn server.
+Gunicorn offers several worker types, including synchronous (sync), threaded, asynchronous, and multiprocessing workers. For this deployment, I’m using the default sync worker, which is well-suited for lightweight applications with low concurrency requirements.
 
 To enable name-based access within the local network, I added a DNS entry for `moviepulse.home` pointing to the IP address of the artemis node hosting the server.
 
@@ -111,7 +107,7 @@ MoviePulse exposes a dedicated set of RESTful APIs, which are consumed by the fr
 
 ## Run as a systemd Service
 
-To run the gunicorn in the background and start it on system boot:
+To run the Gunicorn in the background and start it on system boot:
 
 1. Copy the service file:
 ```bash
@@ -144,7 +140,7 @@ The MoviePulse frontend is developed using standard web technologies: HTML, CSS,
 
 The frontend interacts with the backend exclusively through RESTful APIs exposed by the Flask application. These endpoints are responsible for delivering real-time data from TMDB (The Movie Database) based on user interaction and filter selections.
 
-The main page is organized into several content-rich sections, each populated dynamically via API calls:
+The main page is organized into several sections, each populated dynamically via API calls:
 
 - **Trending Movies** – Displays movies currently trending on TMDB
 - **Trending TV Shows** – Highlights TV shows that are currently trending
@@ -154,17 +150,23 @@ The main page is organized into several content-rich sections, each populated dy
 - **Horror Movies** – Curated list of horror genre titles
 - **Family Animations** – Family-friendly animated titles
 
-Clicking on any movie or TV show card navigates the user to a dedicated details page for that title. This page provides comprehensive information retrieved from the TMDB API. This detailed view allows users to explore each title in depth, offering a richer and more engaging discovery experience beyond the main listing pages.
+Clicking on any movie or TV show card navigates the user to a dedicated details page for that title. This page provides comprehensive information. This detailed view allows users to explore each title in depth, offering a richer and more engaging discovery experience beyond the main listing pages.
 
 <img src="pics/detail.gif" alt="segment">
+
+### Filtering
 
 For Popular Movies and Top-Rated Movies, the frontend provides advanced filtering options that allow users to tailor results based on: Genre, Language, Region, and Year of Release. These filters are implemented using multi-select dropdowns and input fields, providing flexibility in content discovery.
 
 <img src="pics/filter.gif" alt="segment">
 
+### Search
+
 MoviePulse offers a dynamic search feature that allows users to quickly find movies and TV shows. As users type in the search bar, real-time suggestions are displayed based on the input. This live search experience enhances usability by providing instant feedback and reducing the time needed to locate specific titles.
 
 <img src="pics/search.gif" alt="segment">
+
+### Add to Favorite
 
 Users can easily mark their favorite movies or TV shows by clicking the heart icon on each title card. Once marked, the selected title is added to the user’s Favorites list, allowing for quick access and personalized content tracking.
 
