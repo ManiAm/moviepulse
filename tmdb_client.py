@@ -438,15 +438,28 @@ class TMDB_REST_API_Client(REST_API_Client):
         three_months_later = today + relativedelta(months=3)
         three_months_str = three_months_later.strftime("%Y-%m-%d")
 
-        return self.discover_movies(include_adult=False,
-                                    include_video=False,
-                                    language="en-US",
-                                    max_pages=5,
-                                    sort_by="popularity.desc",
-                                    region="US",
-                                    with_release_type="2|3",
-                                    release_date_gte=today_str,
-                                    release_date_lte=three_months_str)
+        status, output = self.discover_movies(include_adult=False,
+                                              include_video=False,
+                                              language="en-US",
+                                              max_pages=5,
+                                              sort_by="popularity.desc",
+                                              region="US",
+                                              with_release_type="2|3",
+                                              release_date_gte=today_str,
+                                              release_date_lte=three_months_str)
+        if not status:
+            return False, output
+
+        movies_candidate = []
+        for movie in output:
+            release_date = movie.get("release_date")
+            release_date = datetime.strptime(release_date, "%Y-%m-%d").date()
+            today = datetime.today().date()
+            if release_date <= today:
+                continue
+            movies_candidate.append(movie)
+
+        return True, movies_candidate
 
 
     def get_movies_popular(self,
