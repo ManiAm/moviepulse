@@ -107,14 +107,16 @@ MoviePulse exposes a dedicated set of RESTful APIs, which are consumed by the fr
 
 ## Run as a systemd Service
 
-To run the Gunicorn in the background and start it on system boot:
+To run the project in the background and start it on system boot:
 
 1. Copy the service file:
+
 ```bash
 sudo cp moviepulse.service /etc/systemd/system/moviepulse.service
 ```
 
 2. Reload systemd and start the service:
+
 ```bash
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
@@ -123,11 +125,13 @@ sudo systemctl start moviepulse
 ```
 
 3. Check status and logs:
+
 ```bash
 sudo systemctl status moviepulse
 ```
 
 4. On service failure check the journal logs:
+
 ```bash
 journalctl -u moviepulse -n 50 --no-pager
 ```
