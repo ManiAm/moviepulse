@@ -1,6 +1,6 @@
 # MoviePulse
 
-My family loves watching movies and TV shows. But with so many titles to choose from — and new ones dropping every week — picking something everyone agrees on for movie night can turn into a mini-debate.
+My family loves watching movies and TV shows. But with so many titles to choose from - and new ones dropping every week - picking something everyone agrees on for movie night can turn into a mini-debate.
 
 This inspired me to build something useful and fun: a web service that fetches trending movies and TV shows. It can show detailed info for each title, and offers a simple UI where my family can browse and vote on what to watch next. It's become our digital movie night assistant!
 
@@ -14,7 +14,7 @@ All movie and TV data is fetched from The Movie Database (TMDb) - [API Reference
 
 To improve response time and reduce redundant calls, Flask leverages an in-memory Redis cache. Frequently accessed data is temporarily stored in Redis, allowing the system to serve cached results quickly rather than querying TMDb on every request.
 
-While Redis is ideal for caching transient data, persistent user-related information—such as interaction logs, preferences, watch history, and session metadata—is stored in a PostgreSQL database. SQLAlchemy serves as the ORM layer, providing a clean and Pythonic interface to interact with the database.
+While Redis is ideal for caching transient data, persistent user-related information - such as interaction logs, preferences, watch history, and session metadata - is stored in a PostgreSQL database. SQLAlchemy serves as the ORM layer, providing a clean and Pythonic interface to interact with the database.
 
 ## Project Structure
 
@@ -40,7 +40,7 @@ The project structure looks like this:
         │   ├── css
         │   └── js
 
-Nginx is configured as a reverse proxy and is forwarding requests to the Gunicorn server. 
+Nginx is configured as a reverse proxy and is forwarding requests to the Gunicorn server.
 
 ```text
 # nginx.conf
@@ -107,14 +107,16 @@ MoviePulse exposes a dedicated set of RESTful APIs, which are consumed by the fr
 
 ## Run as a systemd Service
 
-To run the Gunicorn in the background and start it on system boot:
+To run the project in the background and start it on system boot:
 
 1. Copy the service file:
+
 ```bash
 sudo cp moviepulse.service /etc/systemd/system/moviepulse.service
 ```
 
 2. Reload systemd and start the service:
+
 ```bash
 sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
@@ -123,11 +125,13 @@ sudo systemctl start moviepulse
 ```
 
 3. Check status and logs:
+
 ```bash
 sudo systemctl status moviepulse
 ```
 
 4. On service failure check the journal logs:
+
 ```bash
 journalctl -u moviepulse -n 50 --no-pager
 ```
@@ -172,6 +176,6 @@ Users can easily mark their favorite movies or TV shows by clicking the heart ic
 
 ## Movie Digest (via Discord)
 
-MoviePulse automatically posts a curated list of upcoming movie releases to a designated Discord channel every week. This way, our family stays up to date with the latest upcoming movie releases—making it easy to plan movie nights in advance or mark our calendars for exciting premieres. Whether it’s a highly anticipated blockbuster or a cozy family animation, MoviePulse helps ensure we never miss a release we're looking forward to.
+MoviePulse automatically posts a curated list of upcoming movie releases to a designated Discord channel every week. This way, our family stays up to date with the latest upcoming movie releases - making it easy to plan movie nights in advance or mark our calendars for exciting premieres. Whether it’s a highly anticipated blockbuster or a cozy family animation, MoviePulse helps ensure we never miss a release we're looking forward to.
 
 <img src="pics/upcoming.jpg" alt="segment" width="400">
