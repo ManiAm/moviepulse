@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 load_dotenv()
 
 app = Flask(__name__)
-tmdb = TMDB_REST_API_Client(host="api.themoviedb.org", api_ver="3")
+tmdb = TMDB_REST_API_Client(url="https://api.themoviedb.org", api_ver="3")
 
 #####################################
 

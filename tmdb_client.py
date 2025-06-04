@@ -20,13 +20,12 @@ log = logging.getLogger(__name__)
 class TMDB_REST_API_Client(REST_API_Client):
 
     def __init__(self,
-                 host=None,
-                 port=None,
+                 url=None,
                  api_ver=None,
                  base=None,
                  user=getpass.getuser()):
 
-        super().__init__(host, port, api_ver, base, user)
+        super().__init__(url, api_ver, base, user)
 
         access_token = os.getenv('TMDB_API_TOKEN', None)
         if access_token:
@@ -559,9 +558,7 @@ class TMDB_REST_API_Client(REST_API_Client):
 
 if __name__ == "__main__":
 
-    tmdb = TMDB_REST_API_Client(host="api.themoviedb.org", api_ver="3")
+    tmdb = TMDB_REST_API_Client(url="https://api.themoviedb.org", api_ver="3")
 
     status, output = tmdb.get_countries()
     status, output = tmdb.get_languages()
-
-    bla = 0
